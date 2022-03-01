@@ -64,6 +64,7 @@ std = [
 	"frame-system/std",
 	"pallet-aura/std",
 	"pallet-balances/std",
+	'pallet-nicks/std',
 	"pallet-grandpa/std",
 	"pallet-randomness-collective-flip/std",
 	"pallet-sudo/std",
@@ -94,3 +95,9 @@ runtime-benchmarks = [
 	"pallet-timestamp/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 ]
+
+[dependencies.pallet-nicks]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'devhub/latest'
+version = '4.0.0-dev'
