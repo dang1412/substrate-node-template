@@ -3551,14 +3551,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "node-template"
+name = "node-pixel"
 version = "4.0.0-dev"
 dependencies = [
  "clap",
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "jsonrpc-core",
- "node-template-runtime",
+ "node-pixel-runtime",
  "pallet-transaction-payment-rpc",
  "sc-basic-authorship",
  "sc-cli",
@@ -3588,7 +3588,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "node-template-runtime"
+name = "node-pixel-runtime"
 version = "4.0.0-dev"
 dependencies = [
  "frame-benchmarking",
@@ -3602,9 +3602,9 @@ dependencies = [
  "pallet-balances",
  "pallet-grandpa",
  "pallet-nicks",
+ "pallet-pixel",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
- "pallet-template",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
@@ -3889,6 +3889,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-pixel"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "integer-sqrt",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-randomness-collective-flip"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate.git?tag=devhub/latest#22d40c761a985482f93bbbea5ba4199bdba74f8e"
@@ -3935,20 +3951,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
-]
-
-[[package]]
-name = "pallet-template"
-version = "4.0.0-dev"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-io",
- "sp-runtime",
 ]
 
 [[package]]

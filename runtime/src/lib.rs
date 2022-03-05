@@ -40,8 +40,8 @@ use pallet_transaction_payment::CurrencyAdapter;
 pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
-/// Import the template pallet.
-pub use pallet_template;
+/// Import the pixel pallet.
+pub use pallet_pixel;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -90,8 +90,8 @@ pub mod opaque {
 //   https://docs.substrate.io/v3/runtime/upgrades#runtime-versioning
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("node-template"),
-	impl_name: create_runtime_str!("node-template"),
+	spec_name: create_runtime_str!("node-pixel"),
+	impl_name: create_runtime_str!("node-pixel"),
 	authoring_version: 1,
 	// The version of the runtime specification. A full node will not attempt to use its native
 	//   runtime in substitute for the on-chain Wasm runtime unless all of `spec_name`,
@@ -300,9 +300,15 @@ impl pallet_sudo::Config for Runtime {
 	type Call = Call;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
+/// Configure the pallet-pixel in pallets/pixel.
+parameter_types! {              // <- add this macro
+	// One can own at most 9,999 Kitties
+	pub const MaxPixelOwned: u32 = 100;
+}
+
+impl pallet_pixel::Config for Runtime {
 	type Event = Event;
+	type MaxPixelOwned = MaxPixelOwned;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -320,8 +326,8 @@ construct_runtime!(
 		Balances: pallet_balances,
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
-		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template,
+		// Include the custom logic from the pallet-pixel in the runtime.
+		SubstratePixel: pallet_pixel,
 		Nicks: pallet_nicks,
 	}
 );
@@ -365,7 +371,7 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
-		[pallet_template, TemplateModule]
+		[pallet_pixel, SubstratePixel]
 	);
 }
 
