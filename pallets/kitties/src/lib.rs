@@ -24,13 +24,19 @@ pub mod pallet {
         <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
     // Struct for holding Kitty information.
-    #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+    #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
     #[scale_info(skip_type_params(T))]
     pub struct Kitty<T: Config> {
         pub dna: [u8; 16],
         pub price: Option<BalanceOf<T>>,
         pub gender: Gender,
         pub owner: AccountOf<T>,
+    }
+
+    impl<T: Config> MaxEncodedLen for Kitty<T> {
+        fn max_encoded_len() -> usize {
+            T::AccountId::max_encoded_len() * 2
+        }
     }
 
     // ACTION #2: Enum declaration for Gender.
@@ -96,6 +102,7 @@ pub mod pallet {
     pub enum Event<T: Config> {
         // TODO Part III
         // Success(T::Time, T::Day),
+        Created(T::AccountId, T::Hash),
     }
 
     #[pallet::storage]
@@ -136,7 +143,7 @@ pub mod pallet {
             log::info!("A kitty is born with ID: {:?}.", kitty_id); // <- add this line
 
             // ACTION #4: Deposit `Created` event
-            // Self::deposit_event(Event::Created(sender, kitty_id));
+            Self::deposit_event(Event::Created(sender, kitty_id));
 
             Ok(())
         }
