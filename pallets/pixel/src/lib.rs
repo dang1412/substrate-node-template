@@ -7,35 +7,35 @@ pub use pallet::*;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::pallet_prelude::*;
-	use frame_system::pallet_prelude::*;
+    use frame_support::pallet_prelude::*;
+    use frame_system::pallet_prelude::*;
 
     use scale_info::TypeInfo;
     use integer_sqrt::IntegerSquareRoot;
     use sp_std::vec::Vec;
 
-	/// Configure the pallet by specifying the parameters and types on which it depends.
-	#[pallet::config]
-	pub trait Config: frame_system::Config {
-		/// Because this pallet emits events, it depends on the runtime's definition of an event.
-		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+    /// Configure the pallet by specifying the parameters and types on which it depends.
+    #[pallet::config]
+    pub trait Config: frame_system::Config {
+        /// Because this pallet emits events, it depends on the runtime's definition of an event.
+        type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
         #[pallet::constant]
         type MaxPixelOwned: Get<u32>;
-	}
+    }
 
-	#[pallet::pallet]
-	#[pallet::generate_store(pub(super) trait Store)]
-	pub struct Pallet<T>(_);
+    #[pallet::pallet]
+    #[pallet::generate_store(pub(super) trait Store)]
+    pub struct Pallet<T>(_);
 
     // **************** STORAGE ****************
-	// The pallet's runtime storage items.
-	// https://docs.substrate.io/v3/runtime/storage
+    // The pallet's runtime storage items.
+    // https://docs.substrate.io/v3/runtime/storage
 
-	#[pallet::storage]
-	#[pallet::getter(fn pixel_cnt)]
+    #[pallet::storage]
+    #[pallet::getter(fn pixel_cnt)]
     /// Keeps track of all minted Pixels.
-	pub(super) type PixelCnt<T: Config> = StorageValue<_, u32, ValueQuery>;
+    pub(super) type PixelCnt<T: Config> = StorageValue<_, u32, ValueQuery>;
 
     // Struct for holding Pixel information.
     #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
@@ -76,31 +76,31 @@ pub mod pallet {
 
     // **************** ERROR ****************
     // Errors inform users that something went wrong.
-	#[pallet::error]
-	pub enum Error<T> {
+    #[pallet::error]
+    pub enum Error<T> {
         PixelCntOverflow,
         ExceedMaxPixelOwned,
         PixelNotExist,
         NotPixelOwner,
-	}
+    }
 
     // **************** EVENT ****************
-	// Pallets use events to inform users when important changes are made.
-	// https://docs.substrate.io/v3/runtime/events-and-errors
-	#[pallet::event]
-	#[pallet::generate_deposit(pub(super) fn deposit_event)]
-	pub enum Event<T: Config> {
-		/// Event documentation should end with an array that provides descriptive names for event
-		/// parameters. [something, who]
+    // Pallets use events to inform users when important changes are made.
+    // https://docs.substrate.io/v3/runtime/events-and-errors
+    #[pallet::event]
+    #[pallet::generate_deposit(pub(super) fn deposit_event)]
+    pub enum Event<T: Config> {
+        /// Event documentation should end with an array that provides descriptive names for event
+        /// parameters. [something, who]
         Minted(T::AccountId, u32),
-		PixelMerged(u32, u32, u32),
-	}
+        PixelMerged(u32, u32, u32),
+    }
 
-	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
-	// These functions materialize as "extrinsics", which are often compared to transactions.
-	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
-	#[pallet::call]
-	impl<T: Config> Pallet<T> {
+    // Dispatchable functions allows users to interact with the pallet and invoke state changes.
+    // These functions materialize as "extrinsics", which are often compared to transactions.
+    // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
+    #[pallet::call]
+    impl<T: Config> Pallet<T> {
 
         #[pallet::weight(100)]
         pub fn mint_pixel(origin: OriginFor<T>, pixel_id: u32, width: u32, height: u32) -> DispatchResult {
@@ -128,7 +128,6 @@ pub mod pallet {
         #[pallet::weight(100)]
         pub fn merge_pixel(origin: OriginFor<T>, pixel_id: u32, width: u32, height: u32) -> DispatchResult {
             let sender = ensure_signed(origin)?;
-            let mut rs = Ok(());
 
             // TODO iterate and check all first before mutating storage
 
@@ -136,22 +135,11 @@ pub mod pallet {
 
             // loop through each pixel, check and update
             for id in ids {
-                let pixel = Self::pixels(id);
-
-                // check pixel exist
-                if pixel == None {
-                    rs = Err(<Error<T>>::PixelNotExist);
-                    break;
-                }
-
-                let mut pixel = pixel.unwrap();
+                let mut pixel = Self::pixels(id).ok_or(<Error<T>>::PixelNotExist)?;
 
                 if id != pixel_id {
                     // check owner
-                    if pixel.owner != sender {
-                        rs = Err(<Error<T>>::NotPixelOwner);
-                        break;
-                    }
+                    ensure!(pixel.owner == sender, <Error<T>>::NotPixelOwner);
                     pixel.merged_to = Some(pixel_id);
                 } else {
                     // top-left pixel
@@ -163,11 +151,9 @@ pub mod pallet {
                 <Pixels<T>>::insert(id, pixel);
             }
 
-            rs?;
-
             Ok(())
         }
-	}
+    }
 
     //** Our helper functions.**//
 
